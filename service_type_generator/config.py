@@ -2,7 +2,7 @@ import os
 from google.cloud import bigquery
 
 # Point to your service account key
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"C:\Users\Kültigin\PycharmProjects\pco_analytics\pco-qa-9a3d854dcb14.json"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"PATH-TO-JSON"
 
 BQ_OUTPUT_TABLE = "kulti_test.full_service_type_logic"
 
