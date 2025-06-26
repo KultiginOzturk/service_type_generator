@@ -1,6 +1,11 @@
 from google.cloud import bigquery
 import pandas as pd
-from config import ASK_CLIENT_TABLE
+import os
+from config import DATASET_ID
+
+ASK_CLIENT_TABLE = os.getenv(
+    "ASK_CLIENT_TABLE", f"{DATASET_ID}.ask_client_flags"
+)
 
 def export_askclient_table(final_df):
     print("Exporting AskClient rows to BigQuery...")
