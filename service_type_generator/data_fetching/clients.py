@@ -1,4 +1,12 @@
-from config import SERVICE_TYPES_TABLE
+import os
+
+# Table ID can be overridden with environment variables. It defaults to the
+# DATASET_ID defined in config combined with the service types table name.
+from config import DATASET_ID
+
+SERVICE_TYPES_TABLE = os.getenv(
+    "SERVICE_TYPES_TABLE", f"{DATASET_ID}.kulti_service_types"
+)
 
 
 def get_distinct_clients(bq_client):

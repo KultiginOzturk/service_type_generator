@@ -50,8 +50,10 @@ pip install -r requirements.txt
 Set the following environment variables before running the script:
 
 - `GOOGLE_APPLICATION_CREDENTIALS` - path to your service account key
-- `BQ_OUTPUT_TABLE` - BigQuery table for the full results (default: `kulti_test.full_service_type_logic`)
-- `ASK_CLIENT_TABLE` - table for the AskClient subset (default: `kulti_test.ask_client_flags`)
+- `DATASET_ID` - dataset containing service and output tables (default: `kulti_test`)
+- `TRANSFORMATION_DATASET_ID` - dataset for appointment/subscription tables (default: `transformation_layer`)
+- `BQ_OUTPUT_TABLE` - full results table (defaults to `DATASET_ID.full_service_type_logic`)
+- `ASK_CLIENT_TABLE` - AskClient subset table (defaults to `DATASET_ID.ask_client_flags`)
 
 ### 3. Run the Script
 

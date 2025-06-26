@@ -1,4 +1,9 @@
-from config import SERVICE_TYPES_TABLE
+import os
+from config import DATASET_ID
+
+SERVICE_TYPES_TABLE = os.getenv(
+    "SERVICE_TYPES_TABLE", f"{DATASET_ID}.kulti_service_types"
+)
 
 
 def get_service_types_for_client(bq_client, client_id):
