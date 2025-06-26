@@ -1,0 +1,4 @@
+# Ignore legacy standalone scripts and outputs
+service_type_generator/service_type_generator_standalone/
+__pycache__/
+**/__pycache__/
