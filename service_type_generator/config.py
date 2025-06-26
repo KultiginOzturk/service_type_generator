@@ -1,10 +1,17 @@
 import os
 from google.cloud import bigquery
 
-# Point to your service account key
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"PATH-TO-JSON"
+# Optionally point to a service account key via environment variable
+GOOGLE_APPLICATION_CREDENTIALS = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+if GOOGLE_APPLICATION_CREDENTIALS:
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = GOOGLE_APPLICATION_CREDENTIALS
 
-BQ_OUTPUT_TABLE = "kulti_test.full_service_type_logic"
+# BigQuery table names can be overridden with environment variables
+BQ_OUTPUT_TABLE = os.getenv("BQ_OUTPUT_TABLE", "kulti_test.full_service_type_logic")
+ASK_CLIENT_TABLE = os.getenv("ASK_CLIENT_TABLE", "kulti_test.ask_client_flags")
+SERVICE_TYPES_TABLE = os.getenv("SERVICE_TYPES_TABLE", "kulti_test.kulti_service_types")
+MERGED_APPOINTMENT_TABLE = os.getenv("MERGED_APPOINTMENT_TABLE", "transformation_layer.merged_appointment")
+MERGED_SUBSCRIPTION_TABLE = os.getenv("MERGED_SUBSCRIPTION_TABLE", "transformation_layer.merged_subscription")
 
 BQ_OUTPUT_SCHEMA = [
     bigquery.SchemaField("TYPE_ID", "INT64"),

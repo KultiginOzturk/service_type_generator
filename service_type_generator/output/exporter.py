@@ -1,5 +1,6 @@
 from google.cloud import bigquery
 import pandas as pd
+from config import ASK_CLIENT_TABLE
 
 def export_askclient_table(final_df):
     print("Exporting AskClient rows to BigQuery...")
@@ -38,7 +39,7 @@ def export_askclient_table(final_df):
 
     # Upload to BQ
     bq_client = bigquery.Client()
-    table_id = "kulti_test.ask_client_flags"
+    table_id = ASK_CLIENT_TABLE
 
     job_config = bigquery.LoadJobConfig(
         write_disposition="WRITE_TRUNCATE",
