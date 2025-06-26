@@ -5,6 +5,7 @@ This project analyzes service type data by comparing API flags with keyword-base
 ## Features
 
 - Fetches service type, appointment, and subscription data from BigQuery
+- Validates service type rows against the `merged_service_type` table
 - Applies logic to compare API flags with keyword-based text signals
 - Flags services with conflicting data (`AskClient`)
 - Outputs full data and filtered results to BigQuery
@@ -54,10 +55,11 @@ Set the following environment variables before running the script:
 - `TRANSFORMATION_DATASET_ID` - dataset for appointment/subscription tables (default: `transformation_layer`)
 - `BQ_OUTPUT_TABLE` - full results table (defaults to `DATASET_ID.full_service_type_logic`)
 - `ASK_CLIENT_TABLE` - AskClient subset table (defaults to `DATASET_ID.ask_client_flags`)
+- `CLIENT_IDS` - optional comma-separated list of client IDs to process. Overrides automatic lookup.
 
 ### 3. Run the Script
 
-python main.py
+python main.py [--clients id1,id2]
 
 Outputs
 Full logic results to: value of `BQ_OUTPUT_TABLE`
