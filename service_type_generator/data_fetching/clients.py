@@ -1,7 +1,10 @@
+from config import SERVICE_TYPES_TABLE
+
+
 def get_distinct_clients(bq_client):
-    query = """
+    query = f"""
         SELECT DISTINCT CLIENT AS clientId
-        FROM `kulti_test.kulti_service_types`
+        FROM `{SERVICE_TYPES_TABLE}`
         WHERE CLIENT IS NOT NULL
     """
     print("Fetching distinct clients...")

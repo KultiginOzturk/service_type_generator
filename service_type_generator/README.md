@@ -46,18 +46,21 @@ your_project/
 ```bash
 pip install -r requirements.txt
 
-### 2. Configure Credentials
-Set the path to your Google Cloud service account key in config.py. Do not commit the credential file to version control.
+### 2. Configure Environment
+Set the following environment variables before running the script:
 
+- `GOOGLE_APPLICATION_CREDENTIALS` - path to your service account key
+- `BQ_OUTPUT_TABLE` - BigQuery table for the full results (default: `kulti_test.full_service_type_logic`)
+- `ASK_CLIENT_TABLE` - table for the AskClient subset (default: `kulti_test.ask_client_flags`)
 
 ### 3. Run the Script
 
 python main.py
 
 Outputs
-Full logic results to: kulti_test.full_service_type_logic
+Full logic results to: value of `BQ_OUTPUT_TABLE`
 
-Filtered AskClient results to: kulti_test.ask_client_flags
+Filtered AskClient results to: value of `ASK_CLIENT_TABLE`
 
 Excel exports: final_df.xlsx, askclient_final.xlsx
 

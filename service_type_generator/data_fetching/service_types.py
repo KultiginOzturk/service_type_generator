@@ -1,3 +1,6 @@
+from config import SERVICE_TYPES_TABLE
+
+
 def get_service_types_for_client(bq_client, client_id):
     query = f"""
         SELECT
@@ -8,7 +11,7 @@ def get_service_types_for_client(bq_client, client_id):
             SAFE_CAST(FREQUENCY AS INT64) as API_FREQUENCY,
             SAFE_CAST(DEFAULT_LENGTH AS INT64) as API_DEFAULT_LENGTH,
             CLIENT as clientId
-        FROM `kulti_test.kulti_service_types`
+        FROM `{SERVICE_TYPES_TABLE}`
         WHERE CLIENT = '{client_id}'
     """
     print(f"Fetching service types for client: {client_id}")

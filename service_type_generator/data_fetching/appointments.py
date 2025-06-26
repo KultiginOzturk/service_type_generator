@@ -1,4 +1,5 @@
 import pandas as pd
+from config import MERGED_APPOINTMENT_TABLE
 
 def get_appointments_for_client(bq_client, client_id):
     query = f"""
@@ -7,7 +8,7 @@ def get_appointments_for_client(bq_client, client_id):
             type,
             appointmentDate,
             clientID
-        FROM `transformation_layer.merged_appointment`
+        FROM `{MERGED_APPOINTMENT_TABLE}`
         WHERE clientID = '{client_id}'
     """
     print(f"Fetching appointments for client: {client_id}")
