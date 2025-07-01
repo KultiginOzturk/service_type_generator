@@ -51,6 +51,7 @@ pip install -r requirements.txt
 Set the following environment variables before running the script:
 
 - `GOOGLE_APPLICATION_CREDENTIALS` - path to your service account key
+- `GOOGLE_SHEETS_FOLDER_ID` - optional Drive folder for exporting per-client Google Sheets
 - `DATASET_ID` - dataset containing service and output tables (default: `kulti_test`)
 - `TRANSFORMATION_DATASET_ID` - dataset for appointment/subscription tables (default: `transformation_layer`)
 - `BQ_OUTPUT_TABLE` - full results table (defaults to `DATASET_ID.full_service_type_logic`)
@@ -67,6 +68,7 @@ Full logic results to: value of `BQ_OUTPUT_TABLE`
 Filtered AskClient results to: value of `ASK_CLIENT_TABLE`
 
 Excel exports: final_df.xlsx, askclient_final.xlsx
+Per-client Google Sheets: created or updated in the folder set by `GOOGLE_SHEETS_FOLDER_ID`
 
 Notes
 String matching is used for detecting word signals.
