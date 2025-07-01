@@ -11,7 +11,8 @@ from processing.builder import build_final_dataframe
 from processing.filters import filter_active_subscription
 from output.exporter import export_askclient_table
 from output.uploader import upload_to_bigquery
-from config import BQ_OUTPUT_TABLE, BQ_OUTPUT_SCHEMA
+from output.google_sheets import export_to_google_sheets
+from config import BQ_OUTPUT_TABLE, BQ_OUTPUT_SCHEMA, GOOGLE_SHEET_ID
 import argparse
 import os
 import pandas as pd
@@ -73,6 +74,8 @@ def main():
 
     export_askclient_table(final_df)
     upload_to_bigquery(final_df, BQ_OUTPUT_TABLE, BQ_OUTPUT_SCHEMA)
+    if GOOGLE_SHEET_ID:
+        export_to_google_sheets(final_df, GOOGLE_SHEET_ID)
     final_df.to_excel("final_df.xlsx", index=False)
     print("Done.")
 
