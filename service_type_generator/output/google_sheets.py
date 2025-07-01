@@ -4,13 +4,9 @@ from gspread_dataframe import set_with_dataframe
 from google.oauth2 import service_account
 
 
-def export_to_google_sheets(df, folder_id, worksheet="Sheet1"):
-    """Export each client's data to a sheet inside the given Drive folder.
+def export_to_google_sheets(df, folder_id):
+    """Export per-client data to Google Sheets with three worksheets."""
 
-    If a spreadsheet already exists for a client (named after the client ID)
-    it will be updated. Otherwise a new spreadsheet will be created in the
-    specified folder.
-    """
     credentials_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
     if not credentials_path:
         raise ValueError("GOOGLE_APPLICATION_CREDENTIALS not set")
@@ -24,11 +20,15 @@ def export_to_google_sheets(df, folder_id, worksheet="Sheet1"):
     )
     client = gspread.authorize(creds)
 
-    # Cache existing files in the folder to avoid extra API calls
     existing_files = {
-        f["name"]: f
-        for f in client.list_spreadsheet_files(folder_id=folder_id)
+        f["name"]: f for f in client.list_spreadsheet_files(folder_id=folder_id)
     }
+
+    def get_ws(sheet, name):
+        try:
+            return sheet.worksheet(name)
+        except gspread.WorksheetNotFound:
+            return sheet.add_worksheet(title=name, rows="100", cols="20")
 
     for client_id, client_df in df.groupby("Client"):
         title = str(client_id)
@@ -37,10 +37,41 @@ def export_to_google_sheets(df, folder_id, worksheet="Sheet1"):
         else:
             sheet = client.create(title, folder_id=folder_id)
 
-        try:
-            ws = sheet.worksheet(worksheet)
-        except gspread.WorksheetNotFound:
-            ws = sheet.add_worksheet(title=worksheet, rows="100", cols="20")
+        ws_all = get_ws(sheet, "All Data")
+        ws_all.clear()
+        set_with_dataframe(ws_all, client_df, include_index=False, resize=True)
 
-        ws.clear()
-        set_with_dataframe(ws, client_df, include_index=False, resize=True)
+        askclient_true = client_df[client_df["AskClient"] == True]
+        ws_true = get_ws(sheet, "AskClient True")
+        ws_true.clear()
+        set_with_dataframe(ws_true, askclient_true, include_index=False, resize=True)
+
+        askclient_false = client_df[client_df["AskClient"] == False].copy()
+        askclient_false["Reservice"] = askclient_false.apply(
+            lambda r: r["API Reservice"] or r["Word Signal Reservice"], axis=1
+        )
+        askclient_false["Recurring"] = askclient_false.apply(
+            lambda r: r["API Recurring"] or r["Word Signal Recurring"], axis=1
+        )
+        askclient_false["Zero Time"] = askclient_false.apply(
+            lambda r: r["API Zero Time"] or r["Word Signal Zero Time"], axis=1
+        )
+        askclient_false["Has Reservice"] = askclient_false.apply(
+            lambda r: r["API Has Reservice"] or r["Word Signal Has Reservice"], axis=1
+        )
+        summary_cols = [
+            "TYPE_ID",
+            "DESCRIPTION",
+            "Reservice",
+            "Recurring",
+            "Zero Time",
+            "Has Reservice",
+            "Expired Code",
+            "Client",
+        ]
+        askclient_false = askclient_false[summary_cols]
+
+        ws_false = get_ws(sheet, "AskClient False")
+        ws_false.clear()
+        set_with_dataframe(ws_false, askclient_false, include_index=False, resize=True)
+

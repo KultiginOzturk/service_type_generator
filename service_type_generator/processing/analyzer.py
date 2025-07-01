@@ -26,8 +26,10 @@ def analyze_service_type(row, appointments_df, subs_df, service_types_df, now, c
     lookup_recurring = str(row.get("isRecurring", "")).strip().upper()
     if lookup_recurring == "TRUE":
         word_recurring_bool = True
+        api_recurring_bool = True
     elif lookup_recurring == "FALSE":
         word_recurring_bool = False
+        api_recurring_bool = False
     word_zero_time_bool = any(kw in desc_lower for kw in [
         "equipment", "charge", "lead", "donation", "cancellation", "fee", "write off", "write-off"
     ])
