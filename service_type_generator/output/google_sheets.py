@@ -2,10 +2,14 @@ import os
 import gspread
 from gspread_dataframe import set_with_dataframe
 from google.oauth2 import service_account
+from utils.logger import Logger
+
+logger = Logger(__name__)
 
 
 def export_to_google_sheets(df, folder_id):
     """Export per-client data to Google Sheets with three worksheets."""
+    logger.info("Exporting data to Google Sheets")
 
     credentials_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
     if not credentials_path:

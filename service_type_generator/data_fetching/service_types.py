@@ -1,5 +1,8 @@
 import os
 from config import DATASET_ID, MERGED_SERVICE_TYPE_TABLE
+from utils.logger import Logger
+
+logger = Logger(__name__)
 
 SERVICE_TYPES_TABLE = os.getenv(
     "SERVICE_TYPES_TABLE", f"{DATASET_ID}.kulti_service_types"
@@ -19,7 +22,7 @@ def get_service_types_for_client(bq_client, client_id):
         FROM `{SERVICE_TYPES_TABLE}`
         WHERE CLIENT = '{client_id}'
     """
-    print(f"Fetching service types for client: {client_id}")
+    logger.info(f"Fetching service types for client: {client_id}")
     return bq_client.query(query).to_dataframe()
 
 
@@ -32,5 +35,5 @@ def get_merged_service_types_for_client(bq_client, client_id):
         FROM `{MERGED_SERVICE_TYPE_TABLE}`
         WHERE clientID = '{client_id}'
     """
-    print(f"Fetching merged service types for client: {client_id}")
+    logger.info(f"Fetching merged service types for client: {client_id}")
     return bq_client.query(query).to_dataframe()

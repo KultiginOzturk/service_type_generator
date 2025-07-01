@@ -2,13 +2,16 @@ from google.cloud import bigquery
 import pandas as pd
 import os
 from config import DATASET_ID
+from utils.logger import Logger
+
+logger = Logger(__name__)
 
 ASK_CLIENT_TABLE = os.getenv(
     "ASK_CLIENT_TABLE", f"{DATASET_ID}.ask_client_flags"
 )
 
 def export_askclient_table(final_df):
-    print("Exporting AskClient rows to BigQuery...")
+    logger.info("Exporting AskClient rows to BigQuery...")
 
     askclient_df = final_df[(final_df["AskClient"] == True) & (final_df["Expired Code"] == False)].copy()
 
@@ -66,12 +69,12 @@ def export_askclient_table(final_df):
     )
     load_job.result()
 
-    print(f"AskClient data uploaded to BigQuery table: {table_id}")
+    logger.info(f"AskClient data uploaded to BigQuery table: {table_id}")
 
 
 def export_excel_with_sheets(final_df, filename="final_df.xlsx"):
     """Create an Excel workbook with 3 sheets as specified."""
-    print(f"Writing Excel report to {filename}...")
+    logger.info(f"Writing Excel report to {filename}...")
 
     askclient_true = final_df[final_df["AskClient"] == True].copy()
 
@@ -105,4 +108,4 @@ def export_excel_with_sheets(final_df, filename="final_df.xlsx"):
         askclient_true.to_excel(writer, index=False, sheet_name="AskClient True")
         askclient_false.to_excel(writer, index=False, sheet_name="AskClient False")
 
-    print("Excel report written")
+    logger.info("Excel report written")
