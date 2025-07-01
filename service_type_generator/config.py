@@ -8,6 +8,7 @@ if GOOGLE_APPLICATION_CREDENTIALS:
 
 # Dataset IDs can be customized via environment variables
 DATASET_ID = os.getenv("DATASET_ID", "kulti_test")
+RAW_DATASET_ID = os.getenv("RAW_DATASET_ID", "raw_layer")
 TRANSFORMATION_DATASET_ID = os.getenv("TRANSFORMATION_DATASET_ID", "transformation_layer")
 
 # BigQuery table names can be overridden with environment variables. They default
@@ -22,7 +23,7 @@ MERGED_SERVICE_TYPE_TABLE = os.getenv("MERGED_SERVICE_TYPE_TABLE", f"{TRANSFORMA
 # Lookup table for service type recurrence mapping
 LKP_RECURRING_TABLE = os.getenv(
     "LKP_RECURRING_TABLE",
-    f"{TRANSFORMATION_DATASET_ID}.lkp_sales_mapping_recurring",
+    f"{RAW_DATASET_ID}.lkp_sales_mapping_recurring",
 )
 
 # Optional Google Drive folder ID for exporting per-client sheets
