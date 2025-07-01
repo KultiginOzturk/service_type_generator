@@ -10,7 +10,7 @@ from data_fetching.recurring_lookup import get_recurring_lookup_for_client
 from processing.analyzer import analyze_service_type
 from processing.builder import build_final_dataframe
 from processing.filters import filter_active_subscription
-from output.exporter import export_askclient_table
+from output.exporter import export_askclient_table, export_excel_with_sheets
 from output.uploader import upload_to_bigquery
 from output.google_sheets import export_to_google_sheets
 from config import BQ_OUTPUT_TABLE, BQ_OUTPUT_SCHEMA, GOOGLE_SHEETS_FOLDER_ID
@@ -88,7 +88,7 @@ def main():
     upload_to_bigquery(final_df, BQ_OUTPUT_TABLE, BQ_OUTPUT_SCHEMA)
     if GOOGLE_SHEETS_FOLDER_ID:
         export_to_google_sheets(final_df, GOOGLE_SHEETS_FOLDER_ID)
-    final_df.to_excel("final_df.xlsx", index=False)
+    export_excel_with_sheets(final_df, "final_df.xlsx")
     print("Done.")
 
 
