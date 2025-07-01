@@ -21,6 +21,13 @@ def analyze_service_type(row, appointments_df, subs_df, service_types_df, now, c
     word_recurring_bool = any(kw in desc_lower for kw in [
         "recurring", "monthly", "bi-weekly", "weekly"
     ])
+
+    # Override recurring signal if lookup table provides a value
+    lookup_recurring = str(row.get("isRecurring", "")).strip().upper()
+    if lookup_recurring == "TRUE":
+        word_recurring_bool = True
+    elif lookup_recurring == "FALSE":
+        word_recurring_bool = False
     word_zero_time_bool = any(kw in desc_lower for kw in [
         "equipment", "charge", "lead", "donation", "cancellation", "fee", "write off", "write-off"
     ])
@@ -60,7 +67,14 @@ def analyze_service_type(row, appointments_df, subs_df, service_types_df, now, c
         askclient_reservice_reason = f"Conflict: API says reservice={api_reservice_bool}, word signals={word_reservice_bool}"
 
     if api_recurring_bool != word_recurring_bool:
-        askclient_recurring_reason = f"Conflict: API recurring={api_recurring_bool}, word recurring={word_recurring_bool}"
+        if lookup_recurring in ("TRUE", "FALSE"):
+            askclient_recurring_reason = (
+                f"Conflict: API recurring={api_recurring_bool}, lookup recurring={word_recurring_bool}"
+            )
+        else:
+            askclient_recurring_reason = (
+                f"Conflict: API recurring={api_recurring_bool}, word recurring={word_recurring_bool}"
+            )
 
     if api_zero_time_bool != word_zero_time_bool:
         askclient_zerotime_reason = f"Conflict: API zeroTime={api_zero_time_bool}, word zeroTime={word_zero_time_bool}"
