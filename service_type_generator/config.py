@@ -19,8 +19,8 @@ MERGED_APPOINTMENT_TABLE = os.getenv("MERGED_APPOINTMENT_TABLE", f"{TRANSFORMATI
 MERGED_SUBSCRIPTION_TABLE = os.getenv("MERGED_SUBSCRIPTION_TABLE", f"{TRANSFORMATION_DATASET_ID}.merged_subscription")
 MERGED_SERVICE_TYPE_TABLE = os.getenv("MERGED_SERVICE_TYPE_TABLE", f"{TRANSFORMATION_DATASET_ID}.merged_service_type")
 
-# Optional Google Sheet ID for exporting results
-GOOGLE_SHEET_ID = os.getenv("GOOGLE_SHEET_ID")
+# Optional Google Drive folder ID for exporting per-client sheets
+GOOGLE_SHEETS_FOLDER_ID = os.getenv("GOOGLE_SHEETS_FOLDER_ID")
 
 BQ_OUTPUT_SCHEMA = [
     bigquery.SchemaField("TYPE_ID", "INT64"),
