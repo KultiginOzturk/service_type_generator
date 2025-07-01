@@ -27,7 +27,7 @@ def export_to_google_sheets(df, folder_id, worksheet="Sheet1"):
     # Cache existing files in the folder to avoid extra API calls
     existing_files = {
         f["name"]: f
-        for f in client.list_spreadsheet_files(parent_id=folder_id)
+        for f in client.list_spreadsheet_files(folder_id=folder_id)
     }
 
     for client_id, client_df in df.groupby("Client"):
