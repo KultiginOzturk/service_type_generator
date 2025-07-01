@@ -8,6 +8,7 @@ from data_fetching.appointments import get_appointments_for_client
 from data_fetching.subscriptions import get_subscriptions_for_client
 from processing.analyzer import analyze_service_type
 from processing.builder import build_final_dataframe
+from processing.filters import filter_active_subscription
 from output.exporter import export_askclient_table
 from output.uploader import upload_to_bigquery
 from config import BQ_OUTPUT_TABLE, BQ_OUTPUT_SCHEMA
@@ -67,6 +68,9 @@ def main():
             all_rows.append(result_row)
 
     final_df = build_final_dataframe(all_rows)
+    # Filter to rows with an active subscription before exporting
+    final_df = filter_active_subscription(final_df)
+
     export_askclient_table(final_df)
     upload_to_bigquery(final_df, BQ_OUTPUT_TABLE, BQ_OUTPUT_SCHEMA)
     final_df.to_excel("final_df.xlsx", index=False)
