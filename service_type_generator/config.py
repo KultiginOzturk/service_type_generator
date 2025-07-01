@@ -19,6 +19,12 @@ MERGED_APPOINTMENT_TABLE = os.getenv("MERGED_APPOINTMENT_TABLE", f"{TRANSFORMATI
 MERGED_SUBSCRIPTION_TABLE = os.getenv("MERGED_SUBSCRIPTION_TABLE", f"{TRANSFORMATION_DATASET_ID}.merged_subscription")
 MERGED_SERVICE_TYPE_TABLE = os.getenv("MERGED_SERVICE_TYPE_TABLE", f"{TRANSFORMATION_DATASET_ID}.merged_service_type")
 
+# Lookup table for service type recurrence mapping
+LKP_RECURRING_TABLE = os.getenv(
+    "LKP_RECURRING_TABLE",
+    f"{TRANSFORMATION_DATASET_ID}.lkp_sales_mapping_recurring",
+)
+
 # Optional Google Drive folder ID for exporting per-client sheets
 GOOGLE_SHEETS_FOLDER_ID = os.getenv("GOOGLE_SHEETS_FOLDER_ID")
 

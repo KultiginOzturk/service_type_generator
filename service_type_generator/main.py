@@ -6,6 +6,7 @@ from data_fetching.service_types import (
 )
 from data_fetching.appointments import get_appointments_for_client
 from data_fetching.subscriptions import get_subscriptions_for_client
+from data_fetching.recurring_lookup import get_recurring_lookup_for_client
 from processing.analyzer import analyze_service_type
 from processing.builder import build_final_dataframe
 from processing.filters import filter_active_subscription
@@ -43,6 +44,17 @@ def main():
         print(f"Processing client: {client_id}")
         service_types_df = get_service_types_for_client(bq_client, client_id)
         merged_service_types_df = get_merged_service_types_for_client(bq_client, client_id)
+        recurring_lookup_df = get_recurring_lookup_for_client(bq_client, client_id)
+
+        # Merge lookup on description/serviceType to attach isRecurring info
+        service_types_df = service_types_df.merge(
+            recurring_lookup_df[["serviceType", "isRecurring"]],
+            left_on="DESCRIPTION",
+            right_on="serviceType",
+            how="left",
+        )
+        if "serviceType" in service_types_df.columns:
+            service_types_df.drop(columns=["serviceType"], inplace=True)
 
         merged_check = service_types_df.merge(
             merged_service_types_df[["TYPE_ID", "DESCRIPTION"]],
