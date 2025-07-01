@@ -17,6 +17,9 @@ from config import BQ_OUTPUT_TABLE, BQ_OUTPUT_SCHEMA, GOOGLE_SHEETS_FOLDER_ID
 import argparse
 import os
 import pandas as pd
+from utils.logger import Logger
+
+logger = Logger(__name__)
 
 
 def main():
@@ -41,7 +44,7 @@ def main():
     now = pd.to_datetime("today")
 
     for client_id in clients:
-        print(f"Processing client: {client_id}")
+        logger.info(f"Processing client: {client_id}")
         service_types_df = get_service_types_for_client(bq_client, client_id)
         merged_service_types_df = get_merged_service_types_for_client(bq_client, client_id)
         recurring_lookup_df = get_recurring_lookup_for_client(bq_client, client_id)
@@ -67,10 +70,12 @@ def main():
             | (merged_check["DESCRIPTION_MERGED"] != merged_check["DESCRIPTION"])
         ]
         if not mismatched.empty:
-            print(
-                f"Warning: merged_service_type mismatches for client {client_id}"
+            logger.warning(
+                f"merged_service_type mismatches for client {client_id}"
             )
-            print(mismatched[["TYPE_ID", "DESCRIPTION", "DESCRIPTION_MERGED"]])
+            logger.warning(
+                mismatched[["TYPE_ID", "DESCRIPTION", "DESCRIPTION_MERGED"]].to_dict(orient="records")
+            )
         appointments_df = get_appointments_for_client(bq_client, client_id)
         subscriptions_df = get_subscriptions_for_client(bq_client, client_id)
 
@@ -89,7 +94,7 @@ def main():
     if GOOGLE_SHEETS_FOLDER_ID:
         export_to_google_sheets(final_df, GOOGLE_SHEETS_FOLDER_ID)
     export_excel_with_sheets(final_df, "final_df.xlsx")
-    print("Done.")
+    logger.info("Done.")
 
 
 if __name__ == "__main__":

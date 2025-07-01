@@ -1,6 +1,9 @@
 import os
 from google.cloud import bigquery
 from google.oauth2 import service_account
+from utils.logger import Logger
+
+logger = Logger(__name__)
 
 def get_bq_client():
     # Path to your service-account JSON key.
@@ -20,6 +23,7 @@ def get_bq_client():
         scopes=scopes,
     )
 
+    logger.info("Creating BigQuery client")
     # Return a client that carries both scopes
     return bigquery.Client(
         credentials=creds,
