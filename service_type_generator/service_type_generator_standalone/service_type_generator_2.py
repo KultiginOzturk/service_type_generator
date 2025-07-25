@@ -81,10 +81,10 @@ def main():
         "GOOGLE_APPLICATION_CREDENTIALS"] = r"C:\Users\Kültigin\PycharmProjects\pco_analytics\pco-qa-9a3d854dcb14.json"
     bq_client = bigquery.Client()
 
-    # 1) Get the distinct list of clients from kulti_test.kulti_service_types
+    # 1) Get the distinct list of clients from raw_layer.FR_SERVICE_TYPE
     distinct_clients_query = """
         SELECT DISTINCT CLIENT AS clientId
-        FROM `kulti_test.kulti_service_types`
+        FROM `raw_layer.FR_SERVICE_TYPE`
         WHERE CLIENT IS NOT NULL
     """
     print("Distinct clients selected")
@@ -98,7 +98,7 @@ def main():
     for client_id in all_clients:
         # --- Pull all relevant data for this one client ---
         print(f"Proccessing {client_id}")
-        # kulti_service_types for this client
+        # FR_SERVICE_TYPE for this client
         service_types_query = f"""
             SELECT
                 CAST(TYPE_ID as INT64) as TYPE_ID,
@@ -108,8 +108,16 @@ def main():
                 SAFE_CAST(FREQUENCY AS INT64) as API_FREQUENCY,
                 SAFE_CAST(DEFAULT_LENGTH AS INT64) as API_DEFAULT_LENGTH,
                 CLIENT as clientId
-            FROM `kulti_test.kulti_service_types`
-            WHERE CLIENT = '{client_id}'
+            FROM (
+                SELECT *,
+                    ROW_NUMBER() OVER (
+                        PARTITION BY CLIENT, TYPE_ID
+                        ORDER BY PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%S', DATE_LOADED) DESC
+                    ) AS rn
+                FROM `raw_layer.FR_SERVICE_TYPE`
+                WHERE CLIENT = '{client_id}'
+            )
+            WHERE rn = 1
         """
         service_types_df = bq_client.query(service_types_query).to_dataframe()
 
