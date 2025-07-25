@@ -15,7 +15,9 @@ TRANSFORMATION_DATASET_ID = os.getenv("TRANSFORMATION_DATASET_ID", "transformati
 # to the dataset IDs above combined with the table names used in development.
 BQ_OUTPUT_TABLE = os.getenv("BQ_OUTPUT_TABLE", f"{DATASET_ID}.full_service_type_logic")
 ASK_CLIENT_TABLE = os.getenv("ASK_CLIENT_TABLE", f"{DATASET_ID}.ask_client_flags")
-SERVICE_TYPES_TABLE = os.getenv("SERVICE_TYPES_TABLE", f"{DATASET_ID}.kulti_service_types")
+SERVICE_TYPES_TABLE = os.getenv(
+    "SERVICE_TYPES_TABLE", f"{RAW_DATASET_ID}.FR_SERVICE_TYPE"
+)
 MERGED_APPOINTMENT_TABLE = os.getenv("MERGED_APPOINTMENT_TABLE", f"{TRANSFORMATION_DATASET_ID}.merged_appointment")
 MERGED_SUBSCRIPTION_TABLE = os.getenv("MERGED_SUBSCRIPTION_TABLE", f"{TRANSFORMATION_DATASET_ID}.merged_subscription")
 MERGED_SERVICE_TYPE_TABLE = os.getenv("MERGED_SERVICE_TYPE_TABLE", f"{TRANSFORMATION_DATASET_ID}.merged_service_type")
