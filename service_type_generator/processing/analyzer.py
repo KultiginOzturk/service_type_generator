@@ -174,7 +174,9 @@ def resolve_final_signals(api_signals, word_signals):
     api_reservice = api_signals["isRervice"]
     api_recurring = api_signals["isRecurring"]
     api_zero_time = api_signals["zeroVisitTime"]
-    api_has_reservice = api_signals["isRervice"] or api_signals["isRecurring"]
+    # A service that is explicitly a reservice should not be flagged as "has_reservice".
+    # Interpret "has_reservice" as a property of the base/recurring service only.
+    api_has_reservice = api_signals["isRecurring"]
 
     # Resolve each signal
     # Reservice
@@ -219,6 +221,9 @@ def resolve_final_signals(api_signals, word_signals):
         final_signals["has_reservice"] = None
         conflicts[
             "has_reservice_reason"] = f"Conflict: API hasReservice={api_has_reservice}, word hasReservice={word_signals['has_reservice']}"
+
+    # Allocate Reservices has no word-based override. Carry API value forward for constraint checks.
+    final_signals["allocateReservices"] = api_signals.get("allocateReservices", False)
 
     # Check if any conflicts exist
     has_conflicts = any(conflicts.values())
@@ -309,11 +314,11 @@ def check_business_constraints(final_signals):
         corrections_applied.append("Set allocateReservices to False due to isRervice=True")
         violations.append(BUSINESS_CONSTRAINTS["isRervice_allocateReservices"])
 
-    # 1.2 - anything that is zeroVisitTime = True cannot have allocateReservices as True, set allocateReservices to False
-    if corrected_signals.get("zero_time") is True and corrected_signals.get("allocateReservices") is True:
-        corrected_signals["allocateReservices"] = False
-        corrections_applied.append("Set allocateReservices to False due to zeroVisitTime=True")
-        violations.append(BUSINESS_CONSTRAINTS["zeroVisitTime_allocateReservices"])
+    # 1.2 - anything that is zeroVisitTime = True cannot have has_reservice as True, set has_reservice to False
+    if corrected_signals.get("zero_time") is True and corrected_signals.get("has_reservice") is True:
+        corrected_signals["has_reservice"] = False
+        corrections_applied.append("Set has_reservice to False due to zeroVisitTime=True")
+        violations.append(BUSINESS_CONSTRAINTS["zeroVisitTime_has_reservice"])
 
     # Rule removed: zeroVisitTime=True no longer forces isRecurring=False
 
@@ -322,6 +327,14 @@ def check_business_constraints(final_signals):
         corrected_signals["reservice"] = False
         corrections_applied.append("Set isRervice to False due to isRecurring=True")
         violations.append(BUSINESS_CONSTRAINTS["isRecurring_isRervice"])
+
+    # 1.5 - anything that is isRervice = True cannot have has_reservice = True, set has_reservice to False
+    if corrected_signals.get("reservice") is True and corrected_signals.get("has_reservice") is True:
+        corrected_signals["has_reservice"] = False
+        corrections_applied.append("Set has_reservice to False due to isRervice=True")
+        # Guard in case config is missing the key
+        if "isRervice_hasReservice" in BUSINESS_CONSTRAINTS:
+            violations.append(BUSINESS_CONSTRAINTS["isRervice_hasReservice"])
 
     if violations:
         logger.warning(f"Business constraint violations detected and corrected: {violations}")
@@ -390,7 +403,7 @@ def analyze_service_type(row, appointments_df, subscriptions_df, service_types_d
         "API Reservice": api_analysis["isRervice"],
         "API Recurring": api_analysis["isRecurring"],
         "API Zero Time": api_analysis["zeroVisitTime"],
-        "API Has Reservice": api_analysis["isRervice"] or api_analysis["isRecurring"],
+        "API Has Reservice": api_analysis["isRecurring"],
         "Word Signal Reservice": word_analysis["reservice"],
         "Word Signal Recurring": word_analysis["recurring"],
         "Word Signal Zero Time": word_analysis["zero_time"],

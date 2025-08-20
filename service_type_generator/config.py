@@ -37,13 +37,13 @@ WORD_SIGNALS = {
         "reservice", "call back", "callback", "qc", "quality control", "quality"
     ],
     "recurring": [
-        "recurring", "monthly", "bi-weekly", "weekly"
+        "recurring", "monthly", "bi-weekly", "weekly", "quarterly", "yearly", "yard", "yard service"
     ],
     "zero_time": [
         "equipment", "charge", "lead", "donation", "cancellation", "fee", "write off", "write-off"
     ],
     "has_reservice": [
-        "bed bug", "carpenter", "roach", "ant", "ants", "cockroach", "termite"
+        "bed bug", "carpenter", "roach", "ant", "ants", "cockroach", "termite", "pest", "home", "yard"
     ]
 }
 
@@ -101,7 +101,8 @@ API_SIGNAL_RULES = {
 BUSINESS_CONSTRAINTS = {
     "isRervice_allocateReservices": "isRervice=True cannot have allocateReservices=True",
     "zeroVisitTime_allocateReservices": "zeroVisitTime=True cannot have allocateReservices=True",
-    "isRecurring_isRervice": "isRecurring=True cannot have isRervice=True"
+    "isRecurring_isRervice": "isRecurring=True cannot have isRervice=True",
+    "isRervice_hasReservice": "isRervice=True cannot have has_reservice=True"
 }
 
 BQ_OUTPUT_SCHEMA = [
