@@ -17,17 +17,10 @@ def export_askclient_table(final_df):
 
     askclient_df["Recurrence"] = askclient_df["API FREQUENCY FLAG"]
 
-    askclient_df["hasReservice"] = askclient_df.apply(
-        lambda row: row["API Has Reservice"] or row["Word Signal Has Reservice"], axis=1
-    )
-
-    askclient_df["isRervice"] = askclient_df.apply(
-        lambda row: row["API Reservice"] or row["Word Signal Reservice"], axis=1
-    )
-
-    askclient_df["zeroVisitTime"] = askclient_df.apply(
-        lambda row: row["API Zero Time"] or row["Word Signal Zero Time"], axis=1
-    )
+    # Use the finalized signals that were resolved in the analyzer
+    askclient_df["hasReservice"] = askclient_df["Final Has Reservice"]
+    askclient_df["isRervice"] = askclient_df["Final Reservice"]
+    askclient_df["zeroVisitTime"] = askclient_df["Final Zero Time"]
 
     output_cols = [
         "TYPE_ID",
@@ -55,9 +48,9 @@ def export_askclient_table(final_df):
             bigquery.SchemaField("TYPE_ID", "INT64"),
             bigquery.SchemaField("DESCRIPTION", "STRING"),
             bigquery.SchemaField("Recurrence", "INT64"),
-            bigquery.SchemaField("hasReservice", "BOOLEAN"),
-            bigquery.SchemaField("isRervice", "BOOLEAN"),
-            bigquery.SchemaField("zeroVisitTime", "BOOLEAN"),
+            bigquery.SchemaField("hasReservice", "BOOLEAN", mode="NULLABLE"),
+            bigquery.SchemaField("isRervice", "BOOLEAN", mode="NULLABLE"),
+            bigquery.SchemaField("zeroVisitTime", "BOOLEAN", mode="NULLABLE"),
             bigquery.SchemaField("clientId", "STRING"),
         ],
     )
@@ -79,18 +72,11 @@ def export_excel_with_sheets(final_df, filename="final_df.xlsx"):
     askclient_true = final_df[final_df["AskClient"] == True].copy()
 
     askclient_false = final_df[final_df["AskClient"] == False].copy()
-    askclient_false["Reservice"] = askclient_false.apply(
-        lambda r: r["API Reservice"] or r["Word Signal Reservice"], axis=1
-    )
-    askclient_false["Recurring"] = askclient_false.apply(
-        lambda r: r["API Recurring"] or r["Word Signal Recurring"], axis=1
-    )
-    askclient_false["Zero Time"] = askclient_false.apply(
-        lambda r: r["API Zero Time"] or r["Word Signal Zero Time"], axis=1
-    )
-    askclient_false["Has Reservice"] = askclient_false.apply(
-        lambda r: r["API Has Reservice"] or r["Word Signal Has Reservice"], axis=1
-    )
+    # Use the finalized signals that were resolved in the analyzer
+    askclient_false["Reservice"] = askclient_false["Final Reservice"]
+    askclient_false["Recurring"] = askclient_false["Final Recurring"]
+    askclient_false["Zero Time"] = askclient_false["Final Zero Time"]
+    askclient_false["Has Reservice"] = askclient_false["Final Has Reservice"]
     summary_cols = [
         "TYPE_ID",
         "DESCRIPTION",
@@ -98,6 +84,12 @@ def export_excel_with_sheets(final_df, filename="final_df.xlsx"):
         "Recurring",
         "Zero Time",
         "Has Reservice",
+        "API FREQUENCY FLAG",
+        "API RESERVICE FLAG",
+        "API REGULAR_SERVICE FLAG",
+        "API DEFAULT_LENGTH FLAG",
+        "hasVisitsInPast2Years",
+        "hasActiveSubscription",
         "Expired Code",
         "Client",
     ]

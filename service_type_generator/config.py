@@ -31,6 +31,79 @@ LKP_RECURRING_TABLE = os.getenv(
 # Optional Google Drive folder ID for exporting per-client sheets
 GOOGLE_SHEETS_FOLDER_ID = os.getenv("GOOGLE_SHEETS_FOLDER_ID")
 
+# Keyword lists for text-based signal detection
+WORD_SIGNALS = {
+    "reservice": [
+        "reservice", "call back", "callback", "qc", "quality control", "quality"
+    ],
+    "recurring": [
+        "recurring", "monthly", "bi-weekly", "weekly"
+    ],
+    "zero_time": [
+        "equipment", "charge", "lead", "donation", "cancellation", "fee", "write off", "write-off"
+    ],
+    "has_reservice": [
+        "bed bug", "carpenter", "roach", "ant", "ants", "cockroach", "termite"
+    ]
+}
+
+# Business rules for API signal mapping
+API_SIGNAL_RULES = {
+    "FREQUENCY": {
+        # isRecurring: if > 0 then True
+        "isRecurring": lambda x: True if x is not None and x > 0 else None,
+        "allocateReservices": None,
+        # isRervice: if = 0 then True
+        "isRervice": lambda x: True if x == 0 else None,
+        "zeroVisitTime": None,
+    },
+    "RESERVICE": {
+        # isRecurring: if = 1 then False
+        "isRecurring": lambda x: False if x == 1 else None,
+        # allocateReservices: if = 1 then False
+        "allocateReservices": lambda x: False if x == 1 else None,
+        # isRervice: if = 1 then True
+        "isRervice": lambda x: True if x == 1 else None,
+        "zeroVisitTime": None,
+    },
+    "DEFAULT_LENGTH": {
+        "isRecurring": None,
+        "allocateReservices": None,
+        "isRervice": None,
+        # zeroVisitTime: if = 0 then True
+        "zeroVisitTime": lambda x: True if x == 0 else None,
+    },
+    "INITIAL_ID": {
+        # isRecurring: rule removed
+        "isRecurring": None,
+        "allocateReservices": None,
+        "zeroVisitTime": None,
+    },
+    "REGULAR_SERVICE": {
+        # All REGULAR_SERVICE rules removed
+        "isRecurring": None,
+        "allocateReservices": None,
+        "isRervice": None,
+        "zeroVisitTime": None,
+    },
+    "INITIAL": {
+        # isRecurring: if = 1 then False
+        "isRecurring": lambda x: False if x == 1 else None,
+        "allocateReservices": None,
+        # isRervice: if = 1 then False
+        "isRervice": lambda x: False if x == 1 else None,
+        # zeroVisitTime: if = 1 then False
+        "zeroVisitTime": lambda x: False if x == 1 else None,
+    },
+}
+
+# Business logic constraints
+BUSINESS_CONSTRAINTS = {
+    "isRervice_allocateReservices": "isRervice=True cannot have allocateReservices=True",
+    "zeroVisitTime_allocateReservices": "zeroVisitTime=True cannot have allocateReservices=True",
+    "isRecurring_isRervice": "isRecurring=True cannot have isRervice=True"
+}
+
 BQ_OUTPUT_SCHEMA = [
     bigquery.SchemaField("TYPE_ID", "INT64"),
     bigquery.SchemaField("DESCRIPTION", "STRING"),
@@ -38,6 +111,8 @@ BQ_OUTPUT_SCHEMA = [
     bigquery.SchemaField("API REGULAR_SERVICE FLAG", "INT64"),
     bigquery.SchemaField("API FREQUENCY FLAG", "INT64"),
     bigquery.SchemaField("API DEFAULT_LENGTH FLAG", "INT64"),
+    bigquery.SchemaField("API INITIAL ID FLAG", "INT64"),
+    bigquery.SchemaField("API INITIAL FLAG", "INT64"),
     bigquery.SchemaField("hasVisitsInPast2Years", "BOOL"),
     bigquery.SchemaField("hasActiveSubscription", "BOOL"),
     bigquery.SchemaField("Repeated Name", "BOOL"),
@@ -49,6 +124,10 @@ BQ_OUTPUT_SCHEMA = [
     bigquery.SchemaField("Word Signal Recurring", "BOOL"),
     bigquery.SchemaField("Word Signal Zero Time", "BOOL"),
     bigquery.SchemaField("Word Signal Has Reservice", "BOOL"),
+    bigquery.SchemaField("Final Reservice", "BOOL"),
+    bigquery.SchemaField("Final Recurring", "BOOL"),
+    bigquery.SchemaField("Final Zero Time", "BOOL"),
+    bigquery.SchemaField("Final Has Reservice", "BOOL"),
     bigquery.SchemaField("Expired Code", "BOOL"),
     bigquery.SchemaField("AskClient Reservice - Reason", "STRING"),
     bigquery.SchemaField("AskClient Recurring - Reason", "STRING"),

@@ -16,6 +16,9 @@ class Logger:
     def _format_message(self, message: str, extra: Dict[str, Any]) -> str:
         return f"{message} {extra}" if extra else message
 
+    def debug(self, message: str, **extra: Any) -> None:
+        self._std_logger.debug(self._format_message(message, extra))
+
     def info(self, message: str, **extra: Any) -> None:
         self._std_logger.info(self._format_message(message, extra))
 

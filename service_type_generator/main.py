@@ -48,6 +48,9 @@ def main():
         service_types_df = get_service_types_for_client(bq_client, client_id)
         merged_service_types_df = get_merged_service_types_for_client(bq_client, client_id)
         recurring_lookup_df = get_recurring_lookup_for_client(bq_client, client_id)
+        logger.info(
+            f"Rows fetched for {client_id} — service_types: {len(service_types_df)}, merged_service_types: {len(merged_service_types_df)}, recurring_lookup: {len(recurring_lookup_df)}"
+        )
 
         # Merge lookup on description/serviceType to attach isRecurring info
         service_types_df = service_types_df.merge(
@@ -78,6 +81,9 @@ def main():
             )
         appointments_df = get_appointments_for_client(bq_client, client_id)
         subscriptions_df = get_subscriptions_for_client(bq_client, client_id)
+        logger.info(
+            f"Rows fetched for {client_id} — appointments: {len(appointments_df)}, subscriptions: {len(subscriptions_df)}"
+        )
 
         for _, row in service_types_df.iterrows():
             result_row = analyze_service_type(
