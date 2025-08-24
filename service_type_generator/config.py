@@ -37,10 +37,10 @@ WORD_SIGNALS = {
         "reservice", "call back", "callback", "qc", "quality control", "quality"
     ],
     "recurring": [
-        "recurring", "monthly", "bi-weekly", "weekly", "quarterly", "yearly", "yard", "yard service"
+        "seasonal","recurring", "monthly", "bi-weekly", "weekly", "quarterly", "yearly", "yard", "yard service", "annual", "annually", "bimonthly", "biweekly", "weekly", "per month", "per week", "per quarter", "per year"
     ],
     "zero_time": [
-        "equipment", "charge", "lead", "donation", "cancellation", "fee", "write off", "write-off"
+        "equipment", "charge", "lead", "donation", "cancellation", "fee", "write off", "write-off", "bait", "payment", "collection", "return"
     ],
     "has_reservice": [
         "bed bug", "carpenter", "roach", "ant", "ants", "cockroach", "termite", "pest", "home", "yard"
@@ -52,23 +52,24 @@ API_SIGNAL_RULES = {
     "FREQUENCY": {
         # isRecurring: if > 0 then True
         "isRecurring": lambda x: True if x is not None and x > 0 else None,
-        "allocateReservices": None,
+        "has_reservice": None,
         # isRervice: if = 0 then True
-        "isRervice": lambda x: True if x == 0 else None,
+        # "isRervice": lambda x: True if x == 0 else None,
+        "isRervice": None,
         "zeroVisitTime": None,
     },
     "RESERVICE": {
         # isRecurring: if = 1 then False
         "isRecurring": lambda x: False if x == 1 else None,
-        # allocateReservices: if = 1 then False
-        "allocateReservices": lambda x: False if x == 1 else None,
+        # has_reservice: if = 1 then False
+        "has_reservice": lambda x: False if x == 1 else None,
         # isRervice: if = 1 then True
-        "isRervice": lambda x: True if x == 1 else None,
+        "isRervice": lambda x: True if x == 1 else False,
         "zeroVisitTime": None,
     },
     "DEFAULT_LENGTH": {
         "isRecurring": None,
-        "allocateReservices": None,
+        "has_reservice": None,
         "isRervice": None,
         # zeroVisitTime: if = 0 then True
         "zeroVisitTime": lambda x: True if x == 0 else None,
@@ -76,20 +77,20 @@ API_SIGNAL_RULES = {
     "INITIAL_ID": {
         # isRecurring: rule removed
         "isRecurring": None,
-        "allocateReservices": None,
+        "has_reservice": None,
         "zeroVisitTime": None,
     },
     "REGULAR_SERVICE": {
         # All REGULAR_SERVICE rules removed
         "isRecurring": None,
-        "allocateReservices": None,
+        "has_reservice": None,
         "isRervice": None,
         "zeroVisitTime": None,
     },
     "INITIAL": {
         # isRecurring: if = 1 then False
         "isRecurring": lambda x: False if x == 1 else None,
-        "allocateReservices": None,
+        "has_reservice": None,
         # isRervice: if = 1 then False
         "isRervice": lambda x: False if x == 1 else None,
         # zeroVisitTime: if = 1 then False
@@ -99,10 +100,11 @@ API_SIGNAL_RULES = {
 
 # Business logic constraints
 BUSINESS_CONSTRAINTS = {
-    "isRervice_allocateReservices": "isRervice=True cannot have allocateReservices=True",
-    "zeroVisitTime_allocateReservices": "zeroVisitTime=True cannot have allocateReservices=True",
     "isRecurring_isRervice": "isRecurring=True cannot have isRervice=True",
-    "isRervice_hasReservice": "isRervice=True cannot have has_reservice=True"
+    "isRervice_hasReservice": "isRervice=True cannot have has_reservice=True",
+    "zeroVisitTime_has_reservice": "zeroVisitTime=True cannot have has_reservice=True",
+    # Informational rule (not a violation): recurring=True forces has_reservice=True
+    "recurring_implies_has_reservice": "recurring=True forces has_reservice=True"
 }
 
 BQ_OUTPUT_SCHEMA = [
