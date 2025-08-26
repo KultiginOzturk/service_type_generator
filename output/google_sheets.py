@@ -51,18 +51,11 @@ def export_to_google_sheets(df, folder_id):
         set_with_dataframe(ws_true, askclient_true, include_index=False, resize=True)
 
         askclient_false = client_df[client_df["AskClient"] == False].copy()
-        askclient_false["Reservice"] = askclient_false.apply(
-            lambda r: r["API Reservice"] or r["Word Signal Reservice"], axis=1
-        )
-        askclient_false["Recurring"] = askclient_false.apply(
-            lambda r: r["API Recurring"] or r["Word Signal Recurring"], axis=1
-        )
-        askclient_false["Zero Time"] = askclient_false.apply(
-            lambda r: r["API Zero Time"] or r["Word Signal Zero Time"], axis=1
-        )
-        askclient_false["Has Reservice"] = askclient_false.apply(
-            lambda r: r["API Has Reservice"] or r["Word Signal Has Reservice"], axis=1
-        )
+        # Mirror Excel exporter: use finalized signals
+        askclient_false["Reservice"] = askclient_false["Final Reservice"]
+        askclient_false["Recurring"] = askclient_false["Final Recurring"]
+        askclient_false["Zero Time"] = askclient_false["Final Zero Time"]
+        askclient_false["Has Reservice"] = askclient_false["Final Has Reservice"]
         summary_cols = [
             "TYPE_ID",
             "DESCRIPTION",
@@ -70,6 +63,12 @@ def export_to_google_sheets(df, folder_id):
             "Recurring",
             "Zero Time",
             "Has Reservice",
+            "API FREQUENCY FLAG",
+            "API RESERVICE FLAG",
+            "API REGULAR_SERVICE FLAG",
+            "API DEFAULT_LENGTH FLAG",
+            "hasVisitsInPast2Years",
+            "hasActiveSubscription",
             "Expired Code",
             "Client",
         ]

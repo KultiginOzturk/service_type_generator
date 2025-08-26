@@ -85,9 +85,27 @@ def main():
             f"Rows fetched for {client_id} — appointments: {len(appointments_df)}, subscriptions: {len(subscriptions_df)}"
         )
 
+        # Compute appointment share per service type for prioritization
+        appt_share_pct_by_type = {}
+        top20_type_ids = set()
+        try:
+            if not appointments_df.empty:
+                ap = appointments_df.copy()
+                ap['type_int'] = pd.to_numeric(ap['type'], errors='coerce')
+                counts = ap.dropna(subset=['type_int']).groupby('type_int').size().reset_index(name='appointmentCount')
+                total = counts['appointmentCount'].sum()
+                if total and total > 0:
+                    counts['appointmentSharePct'] = (counts['appointmentCount'] / total * 100).round(2)
+                    appt_share_pct_by_type = {int(row.type_int): float(row.appointmentSharePct) for _, row in counts.iterrows()}
+                    top20 = counts.sort_values('appointmentCount', ascending=False).head(20)
+                    top20_type_ids = set(top20['type_int'].astype(int).tolist())
+        except Exception as e:
+            logger.warning(f"Failed computing appointment share for client {client_id}: {e}")
+
         for _, row in service_types_df.iterrows():
             result_row = analyze_service_type(
-                row, appointments_df, subscriptions_df, service_types_df, now, client_id
+                row, appointments_df, subscriptions_df, service_types_df, now, client_id,
+                appt_share_pct_by_type=appt_share_pct_by_type, top20_type_ids=top20_type_ids
             )
             all_rows.append(result_row)
 

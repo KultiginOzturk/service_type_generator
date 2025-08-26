@@ -58,20 +58,18 @@ def compute_appointment_share(appointments_df: pd.DataFrame, service_types_df: p
     return result
 
 
-def export_appointment_share_for_client(bq_client, client_id: str) -> None:
+def build_share_for_client(bq_client, client_id: str) -> pd.DataFrame:
     logger.info(f"Processing appointment share for client: {client_id}")
     service_types_df = get_service_types_for_client(bq_client, client_id)
     appointments_df = get_appointments_for_client(bq_client, client_id)
 
     share_df = compute_appointment_share(appointments_df, service_types_df)
     if share_df.empty:
-        logger.warning(f"No appointment data for client {client_id}; skipping export.")
-        return
+        logger.warning(f"No appointment data for client {client_id}; skipping.")
+        return pd.DataFrame(columns=["clientId", "TYPE_ID", "service", "appointmentCount", "appointmentSharePct"])  # empty
 
     share_df.insert(0, "clientId", client_id)
-    output_path = f"appointment_share_{client_id}.xlsx"
-    share_df.to_excel(output_path, index=False)
-    logger.info(f"Appointment share written: {output_path}")
+    return share_df
 
 
 def main():
@@ -93,11 +91,24 @@ def main():
         else:
             clients = get_distinct_clients(bq_client)
 
+    all_results = []
     for client_id in clients:
         try:
-            export_appointment_share_for_client(bq_client, client_id)
+            df = build_share_for_client(bq_client, client_id)
+            if df is not None and not df.empty:
+                all_results.append(df)
         except Exception as exc:
-            logger.error(f"Failed to export appointment share for {client_id}: {exc}")
+            logger.error(f"Failed to compute appointment share for {client_id}: {exc}")
+
+    if not all_results:
+        logger.warning("No appointment share data to write.")
+        return
+
+    final_df = pd.concat(all_results, ignore_index=True)
+    final_df.sort_values(by=["clientId", "appointmentCount"], ascending=[True, False], inplace=True)
+    output_path = "appointment_share.xlsx"
+    final_df.to_excel(output_path, index=False)
+    logger.info(f"Appointment share written: {output_path}")
 
 
 if __name__ == "__main__":

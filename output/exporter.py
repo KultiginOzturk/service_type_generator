@@ -29,6 +29,7 @@ def export_askclient_table(final_df):
         "hasReservice",
         "isRervice",
         "zeroVisitTime",
+        "Appointment Share Pct",
         "Client"
     ]
 
@@ -51,6 +52,7 @@ def export_askclient_table(final_df):
             bigquery.SchemaField("hasReservice", "BOOLEAN", mode="NULLABLE"),
             bigquery.SchemaField("isRervice", "BOOLEAN", mode="NULLABLE"),
             bigquery.SchemaField("zeroVisitTime", "BOOLEAN", mode="NULLABLE"),
+            bigquery.SchemaField("Appointment Share Pct", "FLOAT", mode="NULLABLE"),
             bigquery.SchemaField("clientId", "STRING"),
         ],
     )

@@ -107,6 +107,19 @@ BUSINESS_CONSTRAINTS = {
     "recurring_implies_has_reservice": "recurring=True forces has_reservice=True"
 }
 
+BQ_APPOINTMENT_RULES = {
+    "APPT_MIN_VISITS_STRONG": 3,
+    # Cadence bands in days (inclusive lower, exclusive upper)
+    "CADENCE_BANDS": {
+        "weekly_biweekly": (20, 50),
+        "monthly": (50, 90),
+        "bimonthly_quarterly": (90, 150),
+        "yearly": (300, 420),
+    },
+    # Population prior threshold for weak evidence promotion
+    "POP_RATIO_STRONG": 0.6,
+}
+
 BQ_OUTPUT_SCHEMA = [
     bigquery.SchemaField("TYPE_ID", "INT64"),
     bigquery.SchemaField("DESCRIPTION", "STRING"),
@@ -127,6 +140,9 @@ BQ_OUTPUT_SCHEMA = [
     bigquery.SchemaField("Word Signal Recurring", "BOOL"),
     bigquery.SchemaField("Word Signal Zero Time", "BOOL"),
     bigquery.SchemaField("Word Signal Has Reservice", "BOOL"),
+    bigquery.SchemaField("Appt Recurring", "BOOL"),
+    bigquery.SchemaField("Appt Recurring Score", "FLOAT"),
+    bigquery.SchemaField("Appt Recurring - Reason", "STRING"),
     bigquery.SchemaField("Final Reservice", "BOOL"),
     bigquery.SchemaField("Final Recurring", "BOOL"),
     bigquery.SchemaField("Final Zero Time", "BOOL"),
