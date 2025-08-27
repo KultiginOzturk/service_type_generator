@@ -10,6 +10,7 @@ def get_subscriptions_for_client(bq_client, client_id):
             subscriptionID,
             serviceID,
             serviceType,
+            annualRecurringServices,
             active,
             dateCancelled,
             clientID,

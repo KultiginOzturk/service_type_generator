@@ -10,7 +10,8 @@ def get_appointments_for_client(bq_client, client_id):
             individualAccountID,
             type,
             appointmentDate,
-            clientID
+            clientID,
+            productionValue
         FROM `{MERGED_APPOINTMENT_TABLE}`
         WHERE clientID = '{client_id}'
     """

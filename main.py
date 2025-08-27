@@ -62,6 +62,13 @@ def main():
         if "serviceType" in service_types_df.columns:
             service_types_df.drop(columns=["serviceType"], inplace=True)
 
+        # De-duplicate service types per client by TYPE_ID before analysis
+        before_dedup = len(service_types_df)
+        service_types_df = service_types_df.drop_duplicates(subset=["TYPE_ID"])  # safe no-op if already unique
+        after_dedup = len(service_types_df)
+        if after_dedup < before_dedup:
+            logger.info(f"De-duplicated service types for {client_id}: {before_dedup} -> {after_dedup}")
+
         merged_check = service_types_df.merge(
             merged_service_types_df[["TYPE_ID", "DESCRIPTION"]],
             on="TYPE_ID",
@@ -102,12 +109,57 @@ def main():
         except Exception as e:
             logger.warning(f"Failed computing appointment share for client {client_id}: {e}")
 
+        # Compute revenue share per service type from subscriptions (annualRecurringServices)
+        revenue_share_pct_by_type = {}
+        top10_revenue_type_ids = set()
+        try:
+            subs = subscriptions_df.copy()
+            if not subs.empty:
+                # Active subscriptions only
+                subs_active = subs[(subs['active'] == True) & (subs['dateCancelled'].isnull())]
+                # Normalize serviceID type and annualRecurringServices numeric
+                subs_active['service_int'] = pd.to_numeric(subs_active['serviceID'], errors='coerce')
+                ars = subs_active.get('annualRecurringServices')
+                if ars is None:
+                    logger.warning(f"annualRecurringServices column not found in subscriptions for {client_id}. Available columns: {list(subs_active.columns)}")
+                else:
+                    ars_str = ars.astype(str).str.strip()
+                    ars_str = ars_str.str.replace(r'[,$]', '', regex=True)
+                    neg_mask = ars_str.str.match(r'^\(.*\)$', na=False)
+                    ars_str = ars_str.str.replace(r'[()]', '', regex=True)
+                    subs_active['ars_num'] = pd.to_numeric(ars_str, errors='coerce')
+                    subs_active.loc[neg_mask, 'ars_num'] = -subs_active.loc[neg_mask, 'ars_num'].abs()
+                    subs_active = subs_active.dropna(subset=['service_int', 'ars_num'])
+                    if not subs_active.empty:
+                        sums = subs_active.groupby('service_int')['ars_num'].sum().reset_index(name='ars_total')
+                        total_ars = float(sums['ars_total'].sum())
+                        logger.info(f"Total annualRecurringServices for {client_id}: {total_ars:.2f} across {len(sums)} service types")
+                        if total_ars and total_ars > 0:
+                            sums['revenueSharePct'] = (sums['ars_total'] / total_ars * 100).round(2)
+                            revenue_share_pct_by_type = {int(row.service_int): float(row.revenueSharePct) for _, row in sums.iterrows()}
+                            top10 = sums.sort_values('ars_total', ascending=False).head(10)
+                            top10_revenue_type_ids = set(top10['service_int'].astype(int).tolist())
+        except Exception as e:
+            logger.warning(f"Failed computing revenue share (subscriptions) for client {client_id}: {e}")
+
+        client_rows = []
         for _, row in service_types_df.iterrows():
             result_row = analyze_service_type(
                 row, appointments_df, subscriptions_df, service_types_df, now, client_id,
-                appt_share_pct_by_type=appt_share_pct_by_type, top20_type_ids=top20_type_ids
+                appt_share_pct_by_type=appt_share_pct_by_type, top20_type_ids=top20_type_ids,
+                revenue_share_pct_by_type=revenue_share_pct_by_type, top10_revenue_type_ids=top10_revenue_type_ids
             )
             all_rows.append(result_row)
+            client_rows.append(result_row)
+
+        # After finishing this client, export its results to Google Sheets to avoid rate limits later
+        client_final_df = build_final_dataframe(client_rows)
+        client_final_df = filter_active_subscription(client_final_df)
+        if GOOGLE_SHEETS_FOLDER_ID:
+            try:
+                export_to_google_sheets(client_final_df, GOOGLE_SHEETS_FOLDER_ID)
+            except Exception as e:
+                logger.warning(f"Google Sheets export failed for client {client_id}: {e}")
 
     final_df = build_final_dataframe(all_rows)
     # Filter to rows with an active subscription before exporting
@@ -115,8 +167,7 @@ def main():
 
     export_askclient_table(final_df)
     upload_to_bigquery(final_df, BQ_OUTPUT_TABLE, BQ_OUTPUT_SCHEMA)
-    if GOOGLE_SHEETS_FOLDER_ID:
-        export_to_google_sheets(final_df, GOOGLE_SHEETS_FOLDER_ID)
+    # Skip Google Sheets bulk export; already exported per-client above to reduce rate limits
     export_excel_with_sheets(final_df, "final_df.xlsx")
     logger.info("Done.")
 

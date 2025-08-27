@@ -234,6 +234,7 @@ def analyze_usage_patterns(type_id, appointments_df, subscriptions_df, service_t
         "has_visits_past_2yrs": has_visits_past_2yrs,
         "has_active_subscription": has_active_subscription,
         "repeated_name": repeated_name,
+        # Original logic: expired if NO visits in past 2 yrs OR NO active subscription
         "expired_code": (not has_visits_past_2yrs) or (not has_active_subscription)
     }
 
@@ -408,7 +409,7 @@ def check_business_constraints(final_signals):
     return corrected_signals, violations, corrections_applied
 
 
-def analyze_service_type(row, appointments_df, subscriptions_df, service_types_df, now, client_id, appt_share_pct_by_type=None, top20_type_ids=None):
+def analyze_service_type(row, appointments_df, subscriptions_df, service_types_df, now, client_id, appt_share_pct_by_type=None, top20_type_ids=None, revenue_share_pct_by_type=None, top10_revenue_type_ids=None):
     """
     Main analysis function that orchestrates all analysis components.
     
@@ -550,8 +551,19 @@ def analyze_service_type(row, appointments_df, subscriptions_df, service_types_d
     appt_share_pct = None
     if appt_share_pct_by_type is not None:
         appt_share_pct = appt_share_pct_by_type.get(int(type_id), None)
+    high_priority_reason = ""
     if top20_type_ids is not None and int(type_id) in top20_type_ids:
-        askclient_reasons.append("high priority service")
+        high_priority_reason = "high priority service"
+        askclient_reasons.append(high_priority_reason)
+
+    # High revenue service: top 10 by revenue share per client (last 2 years)
+    revenue_share_pct = None
+    if revenue_share_pct_by_type is not None:
+        revenue_share_pct = revenue_share_pct_by_type.get(int(type_id), None)
+    high_revenue_reason = ""
+    if top10_revenue_type_ids is not None and int(type_id) in top10_revenue_type_ids:
+        high_revenue_reason = "high revenue service"
+        askclient_reasons.append(high_revenue_reason)
     
     # Step 4: Analyze usage patterns
     cutoff_date = now - pd.DateOffset(years=2)
@@ -595,6 +607,9 @@ def analyze_service_type(row, appointments_df, subscriptions_df, service_types_d
         "AskClient Zero Time - Reason": "; ".join([r for r in askclient_reasons if r.startswith("zeroVisitTime:")]),
         "AskClient Has Reservice - Reason": "",
         "Appointment Share Pct": appt_share_pct,
+        "Revenue Share Pct": revenue_share_pct,
+        "AskClient High Priority - Reason": high_priority_reason,
+        "AskClient High Revenue - Reason": high_revenue_reason,
         "AskClient": askclient,
         "Client": client_id
     }

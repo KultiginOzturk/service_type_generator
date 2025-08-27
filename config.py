@@ -40,7 +40,7 @@ WORD_SIGNALS = {
         "seasonal","recurring", "monthly", "bi-weekly", "weekly", "quarterly", "yearly", "yard", "yard service", "annual", "annually", "bimonthly", "biweekly", "weekly", "per month", "per week", "per quarter", "per year"
     ],
     "zero_time": [
-        "equipment", "charge", "lead", "donation", "cancellation", "fee", "write off", "write-off", "bait", "payment", "collection", "return"
+        "equipment", "charge", "lead", "donation", "cancellation", "fee", "write off", "write-off", "bait", "payment", "collection", "return", "quote", "free", "billing"
     ],
     "has_reservice": [
         "bed bug", "carpenter", "roach", "ant", "ants", "cockroach", "termite", "pest", "home", "yard"
@@ -153,5 +153,9 @@ BQ_OUTPUT_SCHEMA = [
     bigquery.SchemaField("AskClient Zero Time - Reason", "STRING"),
     bigquery.SchemaField("AskClient Has Reservice - Reason", "STRING"),
     bigquery.SchemaField("AskClient", "BOOL"),
+    bigquery.SchemaField("Appointment Share Pct", "FLOAT"),
+    bigquery.SchemaField("Revenue Share Pct", "FLOAT"),
+    bigquery.SchemaField("AskClient High Priority - Reason", "STRING"),
+    bigquery.SchemaField("AskClient High Revenue - Reason", "STRING"),
     bigquery.SchemaField("Client", "STRING"),
 ]
