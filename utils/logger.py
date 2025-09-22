@@ -1,3 +1,8 @@
+"""
+Utils — Logger
+
+Lightweight wrapper around Python logging with consistent format and helpers.
+"""
 import logging
 from typing import Any, Dict
 

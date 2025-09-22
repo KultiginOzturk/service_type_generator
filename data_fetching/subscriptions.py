@@ -1,3 +1,11 @@
+"""
+Data Fetching — Subscriptions
+
+Loads subscription records for a client from `MERGED_SUBSCRIPTION_TABLE`.
+
+Functions:
+- get_subscriptions_for_client(bq_client, client_id) -> DataFrame
+"""
 from config import MERGED_SUBSCRIPTION_TABLE
 from utils.logger import Logger
 

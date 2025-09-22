@@ -1,3 +1,20 @@
+"""
+Service Type Generator — Main Entrypoint
+
+End-to-end pipeline for computing service-type flags and AskClient outputs per
+client:
+1) Fetch service types, merged service types, recurring lookup, appointments,
+   and subscriptions from BigQuery
+2) Analyze API/text/appointments to produce final signals
+3) Enforce business constraints and derive AskClient markers
+4) Export results to BigQuery and Excel; optionally Google Sheets per client
+
+CLI:
+    python main.py --clients id1,id2
+
+Environment variables consumed here (in addition to those in config):
+- CLIENT_IDS (overridden by --clients)
+"""
 from bq_client import get_bq_client
 from data_fetching.clients import get_distinct_clients
 from data_fetching.service_types import (

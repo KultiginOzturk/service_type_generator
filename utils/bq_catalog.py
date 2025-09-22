@@ -1,3 +1,12 @@
+"""
+Utils — BigQuery Catalog Exporter
+
+Enumerates datasets and tables to produce a JSON and Markdown catalog of table
+schemas for specified GCP projects. Uses the authenticated project if none are
+provided on the CLI.
+
+Executable module: run directly for CLI usage.
+"""
 import os
 import json
 from typing import Any, Dict, Iterable, List, Optional

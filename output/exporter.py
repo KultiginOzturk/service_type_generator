@@ -1,3 +1,12 @@
+"""
+Output — Exporters
+
+Exports AskClient subsets and full results to BigQuery and Excel.
+
+Functions:
+- export_askclient_table(final_df)
+- export_excel_with_sheets(final_df, filename="final_df.xlsx")
+"""
 from google.cloud import bigquery
 import pandas as pd
 import os

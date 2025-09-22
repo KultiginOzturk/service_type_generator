@@ -1,3 +1,12 @@
+"""
+BigQuery Client Factory
+
+Creates and returns a `google.cloud.bigquery.Client` using a service account
+file referenced by `GOOGLE_APPLICATION_CREDENTIALS`. The client is scoped for
+both BigQuery and Drive, supporting downstream exports.
+
+Used by: data fetching utilities, catalog exporter, main entry points.
+"""
 import os
 from google.cloud import bigquery
 from google.oauth2 import service_account

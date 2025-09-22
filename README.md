@@ -1,4 +1,5 @@
 # Service Type Signal Analyzer
+See docs/overview.md for comprehensive documentation and runbook.
 
 This project analyzes service type data by comparing API flags with keyword-based signals in service descriptions. It identifies mismatches and flags them for client review.
 

@@ -1,3 +1,12 @@
+"""
+Data Fetching — Clients
+
+Utilities to enumerate distinct clients from the configured service types
+table. Reads `SERVICE_TYPES_TABLE` derived from `RAW_DATASET_ID`.
+
+Functions:
+- get_distinct_clients(bq_client) -> list[str]
+"""
 import os
 
 # Table ID can be overridden with environment variables. It defaults to the

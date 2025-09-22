@@ -1,3 +1,13 @@
+"""
+Data Fetching — Service Types
+
+Queries current service type rows for a given client and the normalized merged
+service types table for validation.
+
+Functions:
+- get_service_types_for_client(bq_client, client_id) -> DataFrame
+- get_merged_service_types_for_client(bq_client, client_id) -> DataFrame
+"""
 import os
 from config import RAW_DATASET_ID, MERGED_SERVICE_TYPE_TABLE
 from utils.logger import Logger

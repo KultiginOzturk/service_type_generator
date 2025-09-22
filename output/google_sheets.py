@@ -1,3 +1,13 @@
+"""
+Output — Google Sheets
+
+Creates or updates per-client spreadsheets with All Data, AskClient True, and
+AskClient False sheets using service-account credentials. Requires Drive and
+Sheets scopes.
+
+Function:
+- export_to_google_sheets(df, folder_id)
+"""
 import os
 import gspread
 from gspread_dataframe import set_with_dataframe

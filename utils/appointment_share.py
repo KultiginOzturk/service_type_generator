@@ -1,3 +1,12 @@
+"""
+Utils — Appointment Share CLI
+
+Computes appointment counts and share by service for each client and writes an
+Excel report. Reuses the same data-fetching utilities as the main pipeline.
+
+Entrypoint:
+    python -m utils.appointment_share --clients id1,id2
+"""
 import argparse
 import os
 import pandas as pd

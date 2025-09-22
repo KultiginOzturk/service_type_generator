@@ -1,3 +1,12 @@
+"""
+Unfiltered Entrypoint
+
+Runs the full analysis pipeline but skips the "Expired Code" filter for the
+AskClient export. Produces separate Excel outputs for review.
+
+CLI:
+    python utils/unfiltered_main.py --clients id1,id2
+"""
 from bq_client import get_bq_client
 from data_fetching.clients import get_distinct_clients
 from data_fetching.service_types import (

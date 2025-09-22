@@ -1,3 +1,8 @@
+"""
+Processing — Filters
+
+DataFrame filters for post-analysis selection.
+"""
 import pandas as pd
 
 def filter_active_subscription(df: pd.DataFrame) -> pd.DataFrame:

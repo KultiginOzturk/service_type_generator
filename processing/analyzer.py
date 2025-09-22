@@ -1,3 +1,16 @@
+"""
+Processing — Analyzer
+
+Derives signals from API flags, text keywords, sales mapping, and appointments;
+applies business constraints; compiles final outputs including AskClient logic.
+
+Key functions:
+- analyze_api_signals(row)
+- analyze_text_signals(description, lookup_recurring=None)
+- analyze_appointment_recurring(type_id, appointments_df, subscriptions_df, client_id)
+- check_business_constraints(final_signals)
+- analyze_service_type(...)
+"""
 import pandas as pd
 from config import WORD_SIGNALS, API_SIGNAL_RULES, BUSINESS_CONSTRAINTS, BQ_APPOINTMENT_RULES
 from utils.logger import Logger

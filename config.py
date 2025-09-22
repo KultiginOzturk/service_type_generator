@@ -1,3 +1,20 @@
+"""
+Service Type Generator — Configuration
+
+Defines environment-driven configuration: dataset and table names, keyword
+signal dictionaries, API signal mapping rules, business constraints, appointment
+analysis parameters, and the BigQuery output schema used by the toolchain.
+
+Environment variables read by this module:
+- GOOGLE_APPLICATION_CREDENTIALS
+- DATASET_ID, RAW_DATASET_ID, TRANSFORMATION_DATASET_ID
+- BQ_OUTPUT_TABLE, ASK_CLIENT_TABLE, SERVICE_TYPES_TABLE,
+  MERGED_APPOINTMENT_TABLE, MERGED_SUBSCRIPTION_TABLE, MERGED_SERVICE_TYPE_TABLE
+- LKP_RECURRING_TABLE
+- GOOGLE_SHEETS_FOLDER_ID
+
+This module performs no I/O beyond reading environment variables.
+"""
 import os
 from google.cloud import bigquery
 

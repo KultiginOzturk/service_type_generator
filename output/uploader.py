@@ -1,3 +1,12 @@
+"""
+Output — BigQuery Uploader
+
+Uploads the final results DataFrame to the configured BigQuery table using the
+provided schema. Overwrites the destination table by default.
+
+Function:
+- upload_to_bigquery(df, table_id, schema)
+"""
 from google.cloud import bigquery
 from utils.logger import Logger
 

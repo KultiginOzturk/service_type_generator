@@ -1,3 +1,12 @@
+"""
+Data Fetching — Appointments
+
+Loads appointment records for a client from `MERGED_APPOINTMENT_TABLE` and
+parses `appointmentDate` to datetime.
+
+Functions:
+- get_appointments_for_client(bq_client, client_id) -> DataFrame
+"""
 import pandas as pd
 from config import MERGED_APPOINTMENT_TABLE
 from utils.logger import Logger
